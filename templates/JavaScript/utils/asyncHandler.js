@@ -1,4 +1,4 @@
-import appError from "./app.error.js";
+import appError from "./appError.js";
 
 const asyncHandler = (fn) => {
   return async (req, res, next) => {
