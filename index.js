@@ -64,8 +64,14 @@ async function init() {
     main: isSrc ? `src/server${ext}` : `./server${ext}`,
     scripts: {
       start: isSrc ? `node src/server${ext}` : `node ./server${ext}`,
-      watch: isSrc ? `nodemon src/server${ext}` : `node ./server${ext}`,
-      ...(isTs && { build: "tsc" }),
+      watch: isTs
+        ? "nodemon --exec ts-node ./src/server.ts"
+        : isSrc
+        ? `nodemon src/server${ext}`
+        : `node ./server${ext}`,
+      ...(isTs && {
+        build: "tsc",
+      }),
     },
     dependencies: {
       express: `^${expressVersion}`,
