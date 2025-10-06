@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import path from "node:path";
 import inquirer from "inquirer";
 import { exec } from "node:child_process";
@@ -9,6 +7,10 @@ import {
   writeFile,
 } from "./lib/FilesOperation.js";
 import { promisify } from "util";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const execAsync = promisify(exec);
 
@@ -48,7 +50,7 @@ async function init() {
 
   const isTs = language === "TypeScript" ? true : false;
 
-  const templateDir = path.join("./", "templates", `${language}`);
+  const templateDir = path.join(__dirname, "templates", `${language}`);
 
   const expressVersion = await getLatestVersion("express");
   const nodemonVersion = await getLatestVersion("nodemon");
