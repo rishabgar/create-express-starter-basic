@@ -1,17 +1,9 @@
 import path from "node:path";
 import inquirer from "inquirer";
 import { exec } from "node:child_process";
-import {
-  checkExistingPath,
-  copyFilesAndFolders,
-  writeFile,
-} from "./lib/FilesOperation.js";
+import degit from "degit";
+import { checkExistingPath, writeFile } from "./lib/FilesOperation.js";
 import { promisify } from "util";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const execAsync = promisify(exec);
 
 async function getLatestVersion(pacakageName) {
@@ -30,6 +22,7 @@ const projectPath = path.join(process.cwd(), appName);
 await checkExistingPath(projectPath, appName);
 
 async function init() {
+  let language = "JavaScript";
   const { isSrc } = await inquirer.prompt([
     {
       type: "list",
@@ -39,30 +32,53 @@ async function init() {
     },
   ]);
 
-  const { language } = await inquirer.prompt([
+  const { moduleType } = await inquirer.prompt([
     {
       type: "list",
-      name: "language",
-      message: "Which Language Do You Want To Use?",
-      choices: ["JavaScript", "TypeScript"],
+      name: "moduleType",
+      message: "Do you want commonjs or module",
+      choices: ["Module", "CommonJs"],
     },
   ]);
 
-  const isTs = language === "TypeScript" ? true : false;
+  if (moduleType === "Module") {
+    const answer = await inquirer.prompt([
+      {
+        type: "list",
+        name: "language",
+        message: "Which Language Do You Want To Use?",
+        choices: ["JavaScript", "TypeScript"],
+      },
+    ]);
 
-  const templateDir = path.join(__dirname, "templates", `${language}`);
+    language = answer.language;
+  }
+
+  const destination = isSrc ? `./${appName}/src` : `./${appName}`;
+  const moduleTypeLowerCase = moduleType.toLowerCase();
+
+  const emitter = degit(
+    `rishabgar/templates/templates/express/${moduleTypeLowerCase}/${language}`,
+    {
+      cache: false,
+      force: true,
+      verbose: true,
+    }
+  );
+
+  await emitter.clone(destination);
+
+  const isTs = language === "TypeScript" ? true : false;
 
   const expressVersion = await getLatestVersion("express");
   const nodemonVersion = await getLatestVersion("nodemon");
-
-  await copyFilesAndFolders(templateDir, projectPath, isSrc);
 
   const ext = isTs ? ".ts" : ".js";
 
   const packageJson = {
     name: appName,
     version: "1.0.0",
-    type: "module",
+    type: moduleTypeLowerCase === "module" ? "module" : "commonjs",
     main: isSrc ? `src/server${ext}` : `./server${ext}`,
     scripts: {
       start: isSrc ? `node src/server${ext}` : `node ./server${ext}`,
@@ -89,6 +105,12 @@ async function init() {
   };
 
   await writeFile(path.join(projectPath, "package.json"), packageJson);
+
+  console.log(`
+    cd ${appName}
+    npm install
+    npm run watch
+    `);
 }
 
 init();
