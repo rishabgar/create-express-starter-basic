@@ -19,6 +19,8 @@ npx node-quickstartcli
 
 -> Which language do you want to use? (JavaScript / TypeScript)
 
+-> Do you want commonjs or module? (CommonJs / Module)
+
 #### Once answered, it generates a professional project structure with layered architecture.
 
 ## Features
