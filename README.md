@@ -7,10 +7,17 @@ Quickly scaffold a project with layered architecture and customizable options.
 
 ## 🚀 Installation
 
-Run the CLI directly using **`npx node-quickstartcli`** (no global install required):
+Run the CLI directly using **`npx node-quickstartcli <project-name>`** (no global install required):
 
 ```bash
+npx node-quickstartcli my-express-app
+```
+
+### If No Project Name Provided
+
+```
 npx node-quickstartcli
+# Creates a project named "my-express-app"
 ```
 
 ## The CLI will ask you:
