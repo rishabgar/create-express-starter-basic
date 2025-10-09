@@ -1,6 +1,6 @@
 {
   "name": "node-quickstartcli",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "Generate boilerplate Express.js projects with a clean layered architecture in seconds using a CLI.",
   "main": "./dist/index.js",
   "type": "module",

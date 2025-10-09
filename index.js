@@ -1,3 +1,4 @@
+import fs from "fs-extra";
 import path from "node:path";
 import inquirer from "inquirer";
 import { exec } from "node:child_process";
@@ -54,7 +55,7 @@ async function init() {
     language = answer.language;
   }
 
-  const destination = isSrc ? `./${appName}/src` : `./${appName}`;
+  const destination = `./${appName}`;
   const moduleTypeLowerCase = moduleType.toLowerCase();
 
   const emitter = degit(
@@ -69,6 +70,19 @@ async function init() {
   await emitter.clone(destination);
 
   const isTs = language === "TypeScript" ? true : false;
+
+  if (isSrc && isTs) {
+    await fs.ensureDir(`${destination}/src`);
+    const files = await fs.readdir(destination);
+
+    for (const file of files) {
+      if (file !== "src" && file !== "tsconfig.json") {
+        await fs.move(`${destination}/${file}`, `${destination}/src/${file}`, {
+          overwrite: true,
+        });
+      }
+    }
+  }
 
   const expressVersion = await getLatestVersion("express");
   const nodemonVersion = await getLatestVersion("nodemon");
